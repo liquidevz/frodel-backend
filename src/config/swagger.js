@@ -18,7 +18,7 @@ const options = {
         description: 'Development server',
       },
       {
-        url: 'https://api.frozenfood.com',
+        url: 'https://frodel.liquidata.dev',
         description: 'Production server',
       },
     ],
