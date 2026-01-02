@@ -7,14 +7,14 @@ This is a comprehensive REST API for the Frozen Food Directory application built
 ## Base URL
 
 ```
-http://localhost:5000/api
+http://localhost:5002/api
 ```
 
 ## Swagger Documentation
 
 Interactive API documentation is available at:
 ```
-http://localhost:5000/api-docs
+http://localhost:5002/api-docs
 ```
 
 ## Authentication
@@ -544,7 +544,7 @@ Authorization: Bearer <admin_token>
 
 ### Login as Admin
 ```bash
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST http://localhost:5002/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "varunbhole@gmail.com",
@@ -554,12 +554,12 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 ### Get All Products
 ```bash
-curl http://localhost:5000/api/products
+curl http://localhost:5002/api/products
 ```
 
 ### Create Product (requires admin token)
 ```bash
-curl -X POST http://localhost:5000/api/products \
+curl -X POST http://localhost:5002/api/products \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
