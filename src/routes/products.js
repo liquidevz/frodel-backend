@@ -29,7 +29,20 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find({ isActive: true });
-    res.status(200).json({ success: true, data: products });
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    
+    const productsWithImages = products.map(product => {
+      const productObj = product.toObject();
+      if (productObj.images?.length > 0) {
+        productObj.images = productObj.images.map(img => ({
+          ...img,
+          url: img.url.startsWith('http') ? img.url : `${baseUrl}${img.url}`
+        }));
+      }
+      return productObj;
+    });
+    
+    res.status(200).json({ success: true, data: productsWithImages });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -59,7 +72,18 @@ router.get('/:slug', async (req, res) => {
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
-    res.status(200).json({ success: true, data: product });
+    
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const productObj = product.toObject();
+    
+    if (productObj.images?.length > 0) {
+      productObj.images = productObj.images.map(img => ({
+        ...img,
+        url: img.url.startsWith('http') ? img.url : `${baseUrl}${img.url}`
+      }));
+    }
+    
+    res.status(200).json({ success: true, data: productObj });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

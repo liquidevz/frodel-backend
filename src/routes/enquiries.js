@@ -3,6 +3,7 @@ import Enquiry from '../models/Enquiry.js';
 import Product from '../models/Product.js';
 import { protect, authorize } from '../middleware/auth.js';
 import { upload } from '../middleware/upload.js';
+import { createEmailTemplate } from '../config/emailTemplate.js';
 
 const router = express.Router();
 
@@ -240,20 +241,24 @@ router.post('/:slug/reply', protect, authorize('admin'), upload.single('quote'),
       return res.status(404).json({ success: false, message: 'Enquiry not found' });
     }
 
-    const { transporter, emailSignature } = await import('../config/email.js');
+    const { transporter } = await import('../config/email.js');
 
-    const htmlContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">Re: Your Enquiry - ${enquiry.slug}</h2>
-        <div style="margin: 20px 0; line-height: 1.6; color: #374151;">
-          ${message}
-        </div>
-        ${emailSignature}
-      </div>
-    `;
+    // Check if email is configured
+    if (!transporter) {
+      await Enquiry.findOneAndUpdate(
+        { slug: req.params.slug },
+        { status: 'contacted', adminNotes: message }
+      );
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Status updated (Email not configured)' 
+      });
+    }
+
+    const htmlContent = createEmailTemplate(enquiry.slug, message);
 
     const mailOptions = {
-      from: process.env.SMTP_USER,
+      from: '"Frozen Food Directory" <noreply@liquidata.dev>',
       to: enquiry.customerEmail,
       subject: `Re: Your Enquiry - ${enquiry.slug}`,
       html: htmlContent,
@@ -266,16 +271,26 @@ router.post('/:slug/reply', protect, authorize('admin'), upload.single('quote'),
       }];
     }
 
-    await transporter.sendMail(mailOptions);
-
-    await Enquiry.findOneAndUpdate(
-      { slug: req.params.slug },
-      { status: 'contacted' }
-    );
-
-    res.status(200).json({ success: true, message: 'Email sent successfully' });
+    try {
+      await transporter.sendMail(mailOptions);
+      await Enquiry.findOneAndUpdate(
+        { slug: req.params.slug },
+        { status: 'contacted' }
+      );
+      res.status(200).json({ success: true, message: 'Email sent successfully' });
+    } catch (emailError) {
+      // Email failed, but update status anyway
+      await Enquiry.findOneAndUpdate(
+        { slug: req.params.slug },
+        { status: 'contacted', adminNotes: message }
+      );
+      res.status(200).json({ 
+        success: true, 
+        message: 'Status updated (Email delivery failed - check SMTP settings)' 
+      });
+    }
   } catch (error) {
-    console.error('Email error:', error);
+    console.error('Reply error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

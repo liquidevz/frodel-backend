@@ -52,6 +52,7 @@ app.use(cors({
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/logo.png', express.static(path.join(__dirname, '../logo.png')));
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

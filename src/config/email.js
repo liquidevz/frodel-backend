@@ -1,14 +1,23 @@
 import nodemailer from 'nodemailer';
 
-export const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+let transporter = null;
+
+try {
+  if (process.env.SMTP_HOST && process.env.SMTP_USER) {
+    transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT) || 587,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      }
+    });
+  }
+} catch (error) {
+  console.warn('Email configuration error:', error.message);
+}
+
+export { transporter };
 
 export const emailSignature = `
 <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
