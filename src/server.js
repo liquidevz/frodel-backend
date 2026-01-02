@@ -68,9 +68,74 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Server is running' });
 });
 
+// Landing page
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Frodel Backend API</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #fff; }
+        .container { text-align: center; padding: 2rem; max-width: 800px; }
+        h1 { font-size: 3.5rem; margin-bottom: 1rem; animation: fadeIn 0.8s; }
+        .subtitle { font-size: 1.3rem; opacity: 0.9; margin-bottom: 3rem; animation: fadeIn 1s; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); transition: transform 0.3s, box-shadow 0.3s; animation: slideUp 0.6s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .card p { opacity: 0.8; font-size: 0.9rem; }
+        .btn { display: inline-block; background: #fff; color: #667eea; padding: 1rem 2.5rem; border-radius: 50px; text-decoration: none; font-weight: 600; margin: 0.5rem; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .status { display: inline-block; background: #10b981; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; margin-bottom: 2rem; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>🍕 Frodel Backend</h1>
+        <p class="subtitle">Frozen Food Directory API - Fast, Secure & Scalable</p>
+        <div class="status">✓ Server Running</div>
+        <div class="cards">
+          <div class="card">
+            <h3>📦 Products</h3>
+            <p>Complete CRUD operations</p>
+          </div>
+          <div class="card">
+            <h3>📧 Enquiries</h3>
+            <p>Customer management</p>
+          </div>
+          <div class="card">
+            <h3>🔐 Auth</h3>
+            <p>JWT authentication</p>
+          </div>
+          <div class="card">
+            <h3>⚡ Fast</h3>
+            <p>PM2 cluster mode</p>
+          </div>
+        </div>
+        <div>
+          <a href="/api-docs" class="btn">📚 API Documentation</a>
+          <a href="/api/health" class="btn">🏥 Health Check</a>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
 // Swagger documentation endpoint
 app.get('/api/docs', (req, res) => {
   res.redirect('/api-docs');
+});
+
+// Root redirect
+app.get('/api', (req, res) => {
+  res.redirect('/');
 });
 
 // 404 handler
